@@ -1,0 +1,57 @@
+//2021年2月22日22点50分
+
+-- 显示数据库列表
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| crashcourse        |
+| exercise           |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 选择数据库
+mysql> USE crashcourse;
+Database changed
+
+-----------------------------------------------------------------------------------------
+
+-- 显示当前选择的数据库内表的列表
+mysql> SHOW TABLES;
++-----------------------+
+| Tables_in_crashcourse |
++-----------------------+
+| customers             |
+| orderitems            |
+| orders                |
+| productnotes          |
+| products              |
+| vendors               |
++-----------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 显示表中的字段信息
+mysql> SHOW COLUMNS 
+       FROM customers;
++--------------+-----------+------+-----+---------+----------------+
+| Field        | Type      | Null | Key | Default | Extra          |
++--------------+-----------+------+-----+---------+----------------+
+| cust_id      | int       | NO   | PRI | NULL    | auto_increment |    -- 自动增量：MySQL可以自动地为每个行分配下一个可用编号，不用在添加一行时手动分配唯一值
+| cust_name    | char(50)  | NO   |     | NULL    |                |
+| cust_address | char(50)  | YES  |     | NULL    |                |
+| cust_city    | char(50)  | YES  |     | NULL    |                |
+| cust_state   | char(5)   | YES  |     | NULL    |                |
+| cust_zip     | char(10)  | YES  |     | NULL    |                |
+| cust_country | char(50)  | YES  |     | NULL    |                |
+| cust_contact | char(50)  | YES  |     | NULL    |                |
+| cust_email   | char(255) | YES  |     | NULL    |                |
++--------------+-----------+------+-----+---------+----------------+
+
+-- DESCRIBE customers; 是 SHOW COLUMNS FROM customers; 的一种快捷方式;
+-- HELP SHOW 显示允许的SHOW语句

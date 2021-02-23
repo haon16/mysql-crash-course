@@ -1,0 +1,135 @@
+//2021年2月23日21点09分
+
+-- TABLE products:
++---------+---------+----------------+------------+----------------------------------------------------------------+
+| prod_id | vend_id | prod_name      | prod_price | prod_desc                                                      |
++---------+---------+----------------+------------+----------------------------------------------------------------+
+| ANV01   |    1001 | .5 ton anvil   |       5.99 | .5 ton anvil, black, complete with handy hook                  |
+| ANV02   |    1001 | 1 ton anvil    |       9.99 | 1 ton anvil, black, complete with handy hook and carrying case |
+| ANV03   |    1001 | 2 ton anvil    |      14.99 | 2 ton anvil, black, complete with handy hook and carrying case |
+| DTNTR   |    1003 | Detonator      |      13.00 | Detonator (plunger powered), fuses not included                |
+| FB      |    1003 | Bird seed      |      10.00 | Large bag (suitable for road runners)                          |
+| FC      |    1003 | Carrots        |       2.50 | Carrots (rabbit hunting season only)                           |
+| FU1     |    1002 | Fuses          |       3.42 | 1 dozen, extra long                                            |
+| JP1000  |    1005 | JetPack 1000   |      35.00 | JetPack 1000, intended for single use                          |
+| JP2000  |    1005 | JetPack 2000   |      55.00 | JetPack 2000, multi-use                                        |
+| OL1     |    1002 | Oil can        |       8.99 | Oil can, red                                                   |
+| SAFE    |    1003 | Safe           |      50.00 | Safe with combination lock                                     |
+| SLING   |    1003 | Sling          |       4.49 | Sling, one size fits all                                       |
+| TNT1    |    1003 | TNT (1 stick)  |       2.50 | TNT, red, single stick                                         |
+| TNT2    |    1003 | TNT (5 sticks) |      10.00 | TNT, red, pack of 10 sticks                                    |
++---------+---------+----------------+------------+----------------------------------------------------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 排序数据
+mysql> SELECT prod_name 
+       FROM products 
+       ORDER BY prod_name;                -- 以字母顺序排序prod_name列
++----------------+
+| prod_name      |
++----------------+
+| .5 ton anvil   |
+| 1 ton anvil    |
+| 2 ton anvil    |
+| Bird seed      |
+| Carrots        |
+| Detonator      |
+| Fuses          |
+| JetPack 1000   |
+| JetPack 2000   |
+| Oil can        |
+| Safe           |
+| Sling          |
+| TNT (1 stick)  |
+| TNT (5 sticks) |
++----------------+
+
+-- 通常，ORDER BY子句中使用的列将是为显示所选择的列，用非检索的列排序数据也是可以的
+
+-----------------------------------------------------------------------------------------
+
+-- 按多个列排序
+mysql> SELECT prod_id, prod_price, prod_name 
+       FROM products 
+       ORDER BY prod_price, prod_name;
++---------+------------+----------------+
+| prod_id | prod_price | prod_name      |
++---------+------------+----------------+
+| FC      |       2.50 | Carrots        |
+| TNT1    |       2.50 | TNT (1 stick)  |
+| FU1     |       3.42 | Fuses          |
+| SLING   |       4.49 | Sling          |
+| ANV01   |       5.99 | .5 ton anvil   |
+| OL1     |       8.99 | Oil can        |
+| ANV02   |       9.99 | 1 ton anvil    |
+| FB      |      10.00 | Bird seed      |
+| TNT2    |      10.00 | TNT (5 sticks) |
+| DTNTR   |      13.00 | Detonator      |
+| ANV03   |      14.99 | 2 ton anvil    |
+| JP1000  |      35.00 | JetPack 1000   |
+| SAFE    |      50.00 | Safe           |
+| JP2000  |      55.00 | JetPack 2000   |
++---------+------------+----------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 指定排序方向
+mysql> SELECT prod_id, prod_price, prod_name 
+       FROM products 
+       ORDER BY prod_price DESC;                 -- 以价格降序排序产品
++---------+------------+----------------+
+| prod_id | prod_price | prod_name      |
++---------+------------+----------------+
+| JP2000  |      55.00 | JetPack 2000   |
+| SAFE    |      50.00 | Safe           |
+| JP1000  |      35.00 | JetPack 1000   |
+| ANV03   |      14.99 | 2 ton anvil    |
+| DTNTR   |      13.00 | Detonator      |
+| FB      |      10.00 | Bird seed      |
+| TNT2    |      10.00 | TNT (5 sticks) |
+| ANV02   |       9.99 | 1 ton anvil    |
+| OL1     |       8.99 | Oil can        |
+| ANV01   |       5.99 | .5 ton anvil   |
+| SLING   |       4.49 | Sling          |
+| FU1     |       3.42 | Fuses          |
+| FC      |       2.50 | Carrots        |
+| TNT1    |       2.50 | TNT (1 stick)  |
++---------+------------+----------------+
+
+mysql> SELECT prod_id, prod_price, prod_name 
+       FROM products 
+       ORDER BY prod_price DESC, prod_name;     -- 先以价格降序排序产品，然后再对产品名排序
++---------+------------+----------------+
+| prod_id | prod_price | prod_name      |
++---------+------------+----------------+
+| JP2000  |      55.00 | JetPack 2000   |
+| SAFE    |      50.00 | Safe           |
+| JP1000  |      35.00 | JetPack 1000   |
+| ANV03   |      14.99 | 2 ton anvil    |
+| DTNTR   |      13.00 | Detonator      |
+| FB      |      10.00 | Bird seed      |
+| TNT2    |      10.00 | TNT (5 sticks) |
+| ANV02   |       9.99 | 1 ton anvil    |
+| OL1     |       8.99 | Oil can        |
+| ANV01   |       5.99 | .5 ton anvil   |
+| SLING   |       4.49 | Sling          |
+| FU1     |       3.42 | Fuses          |
+| FC      |       2.50 | Carrots        |
+| TNT1    |       2.50 | TNT (1 stick)  |
++---------+------------+----------------+
+
+-- DESC关键字只应用到直接位于其前面的列名。在上例中，prod_price列以降序排序，而prod_name列在每个价格内仍然按照标准的升序排序
+-- 如果想在多个列上进行降序排序，必须对每个列指定DESC关键字
+-- 与DESC相反的关键字是ASC（ASCENDING）,升序是默认的
+
+-- 使用 ORDER BY 和 LIMIT 的组合，能够找出一个列中最高或最低的值。
+mysql> SELECT prod_price 
+       FROM products 
+       ORDER BY prod_price DESC 
+       LIMIT 1;                           -- 找出最昂贵的产品
++------------+
+| prod_price |
++------------+
+|      55.00 |
++------------+
