@@ -1,0 +1,134 @@
+//2021年2月24日23点57分
+
+-- TABLE vendors:
++---------+----------------+-----------------+-------------+------------+----------+--------------+
+| vend_id | vend_name      | vend_address    | vend_city   | vend_state | vend_zip | vend_country |
++---------+----------------+-----------------+-------------+------------+----------+--------------+
+|    1001 | Anvils R Us    | 123 Main Street | Southfield  | MI         | 48075    | USA          |
+|    1002 | LT Supplies    | 500 Park Street | Anytown     | OH         | 44333    | USA          |
+|    1003 | ACME           | 555 High Street | Los Angeles | CA         | 90046    | USA          |
+|    1004 | Furball Inc.   | 1000 5th Avenue | New York    | NY         | 11111    | USA          |
+|    1005 | Jet Set        | 42 Galaxy Road  | London      | NULL       | N16 6PS  | England      |
+|    1006 | Jouets Et Ours | 1 Rue Amusement | Paris       | NULL       | 45678    | France       |
++---------+----------------+-----------------+-------------+------------+----------+--------------+
+
+-- TABLE orderitems:
++-----------+------------+---------+----------+------------+
+| order_num | order_item | prod_id | quantity | item_price |
++-----------+------------+---------+----------+------------+
+|     20005 |          1 | ANV01   |       10 |       5.99 |
+|     20005 |          2 | ANV02   |        3 |       9.99 |
+|     20005 |          3 | TNT2    |        5 |      10.00 |
+|     20005 |          4 | FB      |        1 |      10.00 |
+|     20006 |          1 | JP2000  |        1 |      55.00 |
+|     20007 |          1 | TNT2    |      100 |      10.00 |
+|     20008 |          1 | FC      |       50 |       2.50 |
+|     20009 |          1 | FB      |        1 |      10.00 |
+|     20009 |          2 | OL1     |        1 |       8.99 |
+|     20009 |          3 | SLING   |        1 |       4.49 |
+|     20009 |          4 | ANV03   |        1 |      14.99 |
++-----------+------------+---------+----------+------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 拼接字段
+mysql> SELECT Concat(vend_name, '(', vend_country, ')') 
+       FROM vendors 
+       ORDER BY vend_name;                              -- 在供应商的名字中按照name(location)的格式列出供应商的位置
++-------------------------------------------+
+| Concat(vend_name, '(', vend_country, ')') |
++-------------------------------------------+
+| ACME(USA)                                 |
+| Anvils R Us(USA)                          |
+| Furball Inc.(USA)                         |
+| Jet Set(England)                          |
+| Jouets Et Ours(France)                    |
+| LT Supplies(USA)                          |
++-------------------------------------------+
+
+-- Concat()拼接串，即把多个串连接起来形成一个较长的串
+
+-- 通过删除数据右侧多余的空格来整理数据，这可以使用MySQL的RTrim()函数来完成
+mysql> SELECT Concat(RTrim(vend_name), '(', RTrim(vend_country), ')') 
+       FROM vendors 
+       ORDER BY vend_name;
++---------------------------------------------------------+
+| Concat(RTrim(vend_name), '(', RTrim(vend_country), ')') |
++---------------------------------------------------------+
+| ACME(USA)                                               |
+| Anvils R Us(USA)                                        |
+| Furball Inc.(USA)                                       |     -- 本身列值右侧未包含空格，所以跟上面的结果没区别
+| Jet Set(England)                                        |
+| Jouets Et Ours(France)                                  |
+| LT Supplies(USA)                                        |
++---------------------------------------------------------+
+
+-- LTrim()去掉串左边的空格， Trim去掉串左右两边的空格
+
+-----------------------------------------------------------------------------------------
+
+-- 使用别名
+mysql> SELECT Concat(RTrim(vend_name), '(', RTrim(vend_country), ')') AS vend_title 
+       FROM vendors 
+       ORDER BY vend_name;
++------------------------+
+| vend_title             |
++------------------------+
+| ACME(USA)              |
+| Anvils R Us(USA)       |
+| Furball Inc.(USA)      |
+| Jet Set(England)       |
+| Jouets Et Ours(France) |
+| LT Supplies(USA)       |
++------------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 执行算数计算
+mysql> SELECT prod_id, quantity, item_price 
+       FROM orderitems 
+       WHERE order_num = 20005;             -- 检索订单号20005中的所有物品
++---------+----------+------------+
+| prod_id | quantity | item_price |
++---------+----------+------------+
+| ANV01   |       10 |       5.99 |
+| ANV02   |        3 |       9.99 |
+| TNT2    |        5 |      10.00 |
+| FB      |        1 |      10.00 |
++---------+----------+------------+
+
+mysql> SELECT prod_id, quantity, item_price, quantity*item_price AS expanded_price 
+       FROM orderitems 
+       WHERE order_num = 20005;             -- 汇总物品的价格
++---------+----------+------------+----------------+
+| prod_id | quantity | item_price | expanded_price |
++---------+----------+------------+----------------+
+| ANV01   |       10 |       5.99 |          59.90 |
+| ANV02   |        3 |       9.99 |          29.97 |
+| TNT2    |        5 |      10.00 |          50.00 |
+| FB      |        1 |      10.00 |          10.00 |
++---------+----------+------------+----------------+
+
+-- MySQL算术操作符： +、-、*、/
+-- SELECT可以省略FROM子句以便简单地访问和处理表达式。     SELECT Now(); 
+
+mysql> SELECT 3*2;
++-----+
+| 3*2 |
++-----+
+|   6 |
++-----+
+
+mysql> SELECT RTrim(' abc ');
++----------------+
+| RTrim(' abc ') |
++----------------+
+|  abc           |
++----------------+
+
+mysql> SELECT Now();
++---------------------+
+| Now()               |
++---------------------+
+| 2021-02-24 03:03:12 |
++---------------------+
