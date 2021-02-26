@@ -1,0 +1,122 @@
+//2021年2月25日23点05分
+
+-- TABLE vendors:
++---------+----------------+-----------------+-------------+------------+----------+--------------+
+| vend_id | vend_name      | vend_address    | vend_city   | vend_state | vend_zip | vend_country |
++---------+----------------+-----------------+-------------+------------+----------+--------------+
+|    1001 | Anvils R Us    | 123 Main Street | Southfield  | MI         | 48075    | USA          |
+|    1002 | LT Supplies    | 500 Park Street | Anytown     | OH         | 44333    | USA          |
+|    1003 | ACME           | 555 High Street | Los Angeles | CA         | 90046    | USA          |
+|    1004 | Furball Inc.   | 1000 5th Avenue | New York    | NY         | 11111    | USA          |
+|    1005 | Jet Set        | 42 Galaxy Road  | London      | NULL       | N16 6PS  | England      |
+|    1006 | Jouets Et Ours | 1 Rue Amusement | Paris       | NULL       | 45678    | France       |
++---------+----------------+-----------------+-------------+------------+----------+--------------+
+
+-- TABLE customers:
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+| cust_id | cust_name      | cust_address        | cust_city | cust_state | cust_zip | cust_country | cust_contact | cust_email          |
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+|   10001 | Coyote Inc.    | 200 Maple Lane      | Detroit   | MI         | 44444    | USA          | Y Lee        | ylee@coyote.com     |
+|   10002 | Mouse House    | 333 Fromage Lane    | Columbus  | OH         | 43333    | USA          | Jerry Mouse  | NULL                |
+|   10003 | Wascals        | 1 Sunny Place       | Muncie    | IN         | 42222    | USA          | Jim Jones    | rabbit@wascally.com |
+|   10004 | Yosemite Place | 829 Riverside Drive | Phoenix   | AZ         | 88888    | USA          | Y Sam        | sam@yosemite.com    |
+|   10005 | E Fudd         | 4545 53rd Street    | Chicago   | IL         | 54545    | USA          | E Fudd       | NULL                |
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+
+-- TABLE orders:
++-----------+---------------------+---------+
+| order_num | order_date          | cust_id |
++-----------+---------------------+---------+
+|     20005 | 2005-09-01 00:00:00 |   10001 |
+|     20006 | 2005-09-12 00:00:00 |   10003 |
+|     20007 | 2005-09-30 00:00:00 |   10004 |
+|     20008 | 2005-10-03 00:00:00 |   10005 |
+|     20009 | 2005-10-08 00:00:00 |   10001 |
++-----------+---------------------+---------+
+
+-----------------------------------------------------------------------------------------
+
+-- 文本处理函数
+mysql> SELECT vend_name, Upper(vend_name) AS vend_name_upcase 
+       FROM vendors 
+       ORDER BY vend_name;                  -- 使用Upper()函数将文本转换为大写
++----------------+------------------+
+| vend_name      | vend_name_upcase |
++----------------+------------------+
+| ACME           | ACME             |
+| Anvils R Us    | ANVILS R US      |
+| Furball Inc.   | FURBALL INC.     |
+| Jet Set        | JET SET          |
+| Jouets Et Ours | JOUETS ET OURS   |
+| LT Supplies    | LT SUPPLIES      |
++----------------+------------------+
+
+-- 常用的文本处理函数
+Left()      :   返回串左边的字符
+Length()    :   返回串的长度
+Locate()    :   找出串的一个字串
+Lower()     :   将串转换为小写
+LTrim()     :   去掉串左边的空格
+Right()     :   返回串右边的空格
+RTrim()     :   去掉串右边的空格
+Soundex()   :   返回串的SOUNDEX值（SOUNDEX是一个将任何文本串转换为描述其语音表示的字母数字模式的算法。SOUNDEX考虑了类似的发音字符和音节，使得能对串进行发音比较而不是字母比较）
+SubString() :   返回字串的字符
+Upper()     :   将串转换为大写
+
+-----------------------------------------------------------------------------------------
+
+-- 常用日期和时间处理函数
+AddDate()   :   增加一个日期（天、周等）
+AddTime()   :   增加一个时间（时、分等）
+CurDate()   :   返回当前日期
+CurTime()   :   返回当前时间
+Now()       :   返回当前日期和时间
+DateDiff    :   计算两个日期之差
+Date_Format :   返回一个格式化的日期或时间串
+Date()      :   返回日期时间的日期部分  Day()  Hour()  Minute()  Month()  Year() ...    
+
+
+mysql> SELECT cust_id, order_num 
+       FROM orders 
+       WHERE Date(order_date) = '2005-09-01';       
++---------+-----------+
+| cust_id | order_num |
++---------+-----------+
+|   10001 |     20005 |
++---------+-----------+
+
+-- 使用Date()函数指示MySQL只提取列的日期部分，否则如果order_date除日期外还包含时间的话就会匹配失败
+
+
+mysql> SELECT cust_id, order_num 
+       FROM orders 
+       WHERE Date(order_date) BETWEEN '2005-09-01' AND '2005-09-30';        -- 匹配出2005年9月下的所有订单
++---------+-----------+
+| cust_id | order_num |
++---------+-----------+
+|   10001 |     20005 |
+|   10003 |     20006 |
+|   10004 |     20007 |
++---------+-----------+
+
+mysql> SELECT cust_id, order_num 
+       FROM orders 
+       WHERE Year(order_date) = 2005 AND Month(order_date) = 9;             -- 另一种不需要记住每个月多少天或不需要操心闰年2月的办法
++---------+-----------+
+| cust_id | order_num |
++---------+-----------+
+|   10001 |     20005 |
+|   10003 |     20006 |
+|   10004 |     20007 |
++---------+-----------+
+
+-----------------------------------------------------------------------------------------
+
+-- 数值处理函数（数值处理函数仅处理数值数据）
+Abs()   :   返回一个数的绝对值
+Exp()   :   返回一个数的指数值
+Mod()   :   返回除操作数的余数
+Pi()    :   返回圆周率
+Rand()  :   返回一个随机数
+Cos()   :   返回一个角度的余弦  Sin()   Tan()
+Sqrt()  :   返回一个数的平方根
