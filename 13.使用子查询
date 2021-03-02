@@ -1,0 +1,132 @@
+//2021年2月27日20点55分
+
+-- TABLE orders:
++-----------+---------------------+---------+
+| order_num | order_date          | cust_id |
++-----------+---------------------+---------+
+|     20005 | 2005-09-01 00:00:00 |   10001 |
+|     20006 | 2005-09-12 00:00:00 |   10003 |
+|     20007 | 2005-09-30 00:00:00 |   10004 |
+|     20008 | 2005-10-03 00:00:00 |   10005 |
+|     20009 | 2005-10-08 00:00:00 |   10001 |
++-----------+---------------------+---------+
+
+-- TABLE orderitems:
++-----------+------------+---------+----------+------------+
+| order_num | order_item | prod_id | quantity | item_price |
++-----------+------------+---------+----------+------------+
+|     20005 |          1 | ANV01   |       10 |       5.99 |
+|     20005 |          2 | ANV02   |        3 |       9.99 |
+|     20005 |          3 | TNT2    |        5 |      10.00 |
+|     20005 |          4 | FB      |        1 |      10.00 |
+|     20006 |          1 | JP2000  |        1 |      55.00 |
+|     20007 |          1 | TNT2    |      100 |      10.00 |
+|     20008 |          1 | FC      |       50 |       2.50 |
+|     20009 |          1 | FB      |        1 |      10.00 |
+|     20009 |          2 | OL1     |        1 |       8.99 |
+|     20009 |          3 | SLING   |        1 |       4.49 |
+|     20009 |          4 | ANV03   |        1 |      14.99 |
++-----------+------------+---------+----------+------------+
+
+-- TABLE customers:
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+| cust_id | cust_name      | cust_address        | cust_city | cust_state | cust_zip | cust_country | cust_contact | cust_email          |
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+|   10001 | Coyote Inc.    | 200 Maple Lane      | Detroit   | MI         | 44444    | USA          | Y Lee        | ylee@coyote.com     |
+|   10002 | Mouse House    | 333 Fromage Lane    | Columbus  | OH         | 43333    | USA          | Jerry Mouse  | NULL                |
+|   10003 | Wascals        | 1 Sunny Place       | Muncie    | IN         | 42222    | USA          | Jim Jones    | rabbit@wascally.com |
+|   10004 | Yosemite Place | 829 Riverside Drive | Phoenix   | AZ         | 88888    | USA          | Y Sam        | sam@yosemite.com    |
+|   10005 | E Fudd         | 4545 53rd Street    | Chicago   | IL         | 54545    | USA          | E Fudd       | NULL                |
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 利用子查询进行过滤（子查询：嵌套在其他查询中的查询）
+
+-- 列出订购物品TNT2的所有客户
+（1）检索包含物品TNT2的所有订单的编号
+（2）检索具有前一步骤列出的订单编号的所有客户的ID
+（3）检索前一步骤返回的所有客户ID的客户信息
+
+-- 把一条SELECT语句返回的结果用于另一条SELECT语句的WHERE子句
+mysql> SELECT order_num 
+       FROM orderitems 
+       WHERE prod_id = 'TNT2';
++-----------+
+| order_num |
++-----------+
+|     20005 |
+|     20007 |
++-----------+
+
+mysql> SELECT cust_id 
+       FROM orders 
+       WHERE order_num IN (20005, 20007);
++---------+
+| cust_id |
++---------+
+|   10001 |
+|   10004 |
++---------+
+
+mysql> SELECT cust_name, cust_contact 
+       FROM customers 
+       WHERE cust_id IN (10001, 10004);
++----------------+--------------+
+| cust_name      | cust_contact |
++----------------+--------------+
+| Coyote Inc.    | Y Lee        |
+| Yosemite Place | Y Sam        |
++----------------+--------------+
+
+-- 子查询
+mysql> SELECT cust_name, cust_contact 
+       FROM customers 
+       WHERE cust_id IN (SELECT cust_id 
+                         FROM orders 
+                         WHERE order_num IN (SELECT order_num 
+                                             FROM orderitems 
+                                             WHERE prod_id = 'TNT2'));
++----------------+--------------+
+| cust_name      | cust_contact |
++----------------+--------------+
+| Coyote Inc.    | Y Lee        |
+| Yosemite Place | Y Sam        |
++----------------+--------------+
+
+-- 在SELECT语句中，子查询总是从内向外处理       （最里边的子查询返回订单号列表，外面的子查询返回客户ID列表，最外层查询返回所需要的数据）
+
+-----------------------------------------------------------------------------------------
+
+-- 作为计算字段使用子查询
+
+-- 显示customers表中每个客户的订单总数
+（1）从customers表中检索客户列表
+（2）对于检索出的每个客户，统计其在orders表中的订单数目
+
+mysql> SELECT COUNT(*) AS orders 
+       FROM orders 
+       WHERE cust_id = 10001;               -- 对指定的客户的订单进行计数
++--------+
+| orders |
++--------+
+|      2 |
++--------+
+
+mysql> SELECT cust_name, 
+              cust_state, 
+              (SELECT COUNT(*) 
+               FROM orders WHERE orders.cust_id = customers.cust_id) AS orders 
+              FROM customers 
+              ORDER BY cust_name;           -- 为了对每个客户执行COUNT(*)计算，应该将COUNT(*)作为一个子查询
++----------------+------------+--------+
+| cust_name      | cust_state | orders |
++----------------+------------+--------+
+| Coyote Inc.    | MI         |      2 |
+| E Fudd         | IL         |      1 |
+| Mouse House    | OH         |      0 |
+| Wascals        | IN         |      1 |
+| Yosemite Place | AZ         |      1 |
++----------------+------------+--------+
+
+-- 相关子查询：涉及外部查询的子查询     （WHERE orders.cust_id = customers.cust_id）
