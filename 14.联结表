@@ -102,8 +102,7 @@ mysql> SELECT vend_name, prod_name, prod_price
 
 -----------------------------------------------------------------------------------------
 
--- 内部链接
-
+-- 内部联结
 -- 目前为止所用的联结称为等值联结，它基于两个表之间的相等测试。这种联结也称为内部联结。对于这种联结可以使用稍微不同的语法来明确指定联结的类型
 mysql> SELECT vend_name, prod_name, prod_price 
        FROM vendors INNER JOIN products 
