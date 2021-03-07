@@ -1,0 +1,126 @@
+//2021年3月7日12点50分
+
+-- TABLE customers:
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+| cust_id | cust_name      | cust_address        | cust_city | cust_state | cust_zip | cust_country | cust_contact | cust_email          |
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+|   10001 | Coyote Inc.    | 200 Maple Lane      | Detroit   | MI         | 44444    | USA          | Y Lee        | ylee@coyote.com     |
+|   10002 | Mouse House    | 333 Fromage Lane    | Columbus  | OH         | 43333    | USA          | Jerry Mouse  | NULL                |
+|   10003 | Wascals        | 1 Sunny Place       | Muncie    | IN         | 42222    | USA          | Jim Jones    | rabbit@wascally.com |
+|   10004 | Yosemite Place | 829 Riverside Drive | Phoenix   | AZ         | 88888    | USA          | Y Sam        | sam@yosemite.com    |
+|   10005 | E Fudd         | 4545 53rd Street    | Chicago   | IL         | 54545    | USA          | E Fudd       | NULL                |
++---------+----------------+---------------------+-----------+------------+----------+--------------+--------------+---------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 插入完整的行
+mysql> INSERT INTO customers 
+       VALUES(NULL,                     -- cust_id由MySQL自动增量
+            'Pep E. LaPew', 
+            '100 Main Street', 
+            'Los Angeles', 
+            'CA', 
+            '90046', 
+            'USA', 
+            NULL, 
+            NULL);
+
+-- 这种插入语句不安全，因为高度依赖于表中列的定义次序（表结构可能变动）
+
+mysql> INSERT INTO customers(cust_address,
+            cust_city,
+            cust_state,
+            cust_zip,
+            cust_country,
+            cust_contact,
+            cust_email)
+        VALUES('Pep E. LaPew', 
+            '100 Main Street', 
+            'Los Angeles', 
+            'CA', 
+            '90046', 
+            'USA', 
+            NULL, 
+            NULL);
+
+-- 在表明后的括号里明确地给出了列名，VALUES必须以其指定的次序匹配指定的列名，不一定按各个列出现在实际表中的次序。优点时即使表的结构哦改变，此INSERT语句仍然能正确工作。
+-- 省略列的条件：允许为NULL值或者表定义给出了默认值
+
+-----------------------------------------------------------------------------------------
+
+-- 插入多个行
+
+mysql> INSERT INTO customers(cust_name,         -- 多条INSERT语句
+            cust_address,
+            cust_city,
+            cust_state,
+            cust_zip,
+            cust_country)
+        VALUES('Pep E. LaPew', 
+            '100 Main Street', 
+            'Los Angeles', 
+            'CA', 
+            '90046', 
+            'USA');
+      INSERT INTO customers(cust_name,
+            cust_address,
+            cust_city,
+            cust_state,
+            cust_zip,
+            cust_country)
+        VALUES('M. Martian', 
+            '100 Main Street', 
+            'New York', 
+            'NY',
+            '11213', 
+            'USA');
+
+mysql> INSERT INTO customers(cust_name,         -- 单条INSERT语句
+            cust_address,
+            cust_city,
+            cust_state,
+            cust_zip,
+            cust_country)
+        VALUES(
+                'Pep E. LaPew', 
+                '100 Main Street', 
+                'Los Angeles', 
+                'CA', 
+                '90046', 
+                'USA'
+            ),
+            (
+                'M. Martian', 
+                '100 Main Street', 
+                'New York', 
+                'NY',
+                '11213', 
+                'USA'
+            );
+
+-- MySQL用单条INSERT语句处理多个插入比使用多条INSERT语句快
+
+-----------------------------------------------------------------------------------------
+
+-- 插入检索出的数据
+mysql> INSERT INTO customers(cust_id,
+            cust_contact,
+            cust_email,
+            cust_name,
+            cust_address,
+            cust_city,
+            cust_state,
+            cust_zip,
+            cust_country)
+        SELECT cust_id,
+            cust_contact,
+            cust_email,
+            cust_name,
+            cust_address,
+            cust_city,
+            cust_state,
+            cust_zip,
+            cust_country
+        FROM custNew;                       -- 从另一表中合并客户列表到customers表
+
+-- 两个表的列名不一定要匹配
