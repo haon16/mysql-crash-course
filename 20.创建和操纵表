@@ -1,0 +1,127 @@
+//2021年3月16日23点57分
+
+-- TABLE customers:
++---------+----------------+---------------------+-------------+------------+----------+--------------+--------------+---------------------+
+| cust_id | cust_name      | cust_address        | cust_city   | cust_state | cust_zip | cust_country | cust_contact | cust_email          |
++---------+----------------+---------------------+-------------+------------+----------+--------------+--------------+---------------------+
+|   10001 | Coyote Inc.    | 200 Maple Lane      | Detroit     | MI         | 44444    | USA          | Y Lee        | ylee@coyote.com     |
+|   10002 | Mouse House    | 333 Fromage Lane    | Columbus    | OH         | 43333    | USA          | Jerry Mouse  | NULL                |
+|   10003 | Wascals        | 1 Sunny Place       | Muncie      | IN         | 42222    | USA          | Jim Jones    | rabbit@wascally.com |
+|   10004 | Yosemite Place | 829 Riverside Drive | Phoenix     | AZ         | 88888    | USA          | Y Sam        | sam@yosemite.com    |
+|   10005 | E Fudd         | 4545 53rd Street    | Chicago     | IL         | 54545    | USA          | E Fudd       | NULL                |
+|   10006 | Pep E. LaPew   | 100 Main Street     | Los Angeles | CA         | 90046    | USA          | NULL         | NULL                |
++---------+----------------+---------------------+-------------+------------+----------+--------------+--------------+---------------------+
+
+-----------------------------------------------------------------------------------------
+
+-- 表创建基础
+
+-- 为利用CREATE TABLE创建表，必须给出的信息：新表的名字，在关键字CREATE TABLE之后给出；表列的名字和定义，用逗号分隔
+
+CREATE TABLE customers              
+(
+  cust_id      int       NOT NULL AUTO_INCREMENT,
+  cust_name    char(50)  NOT NULL ,
+  cust_address char(50)  NULL ,
+  cust_city    char(50)  NULL ,
+  cust_state   char(5)   NULL ,
+  cust_zip     char(10)  NULL ,
+  cust_country char(50)  NULL ,
+  cust_contact char(50)  NULL ,
+  cust_email   char(255) NULL ,
+  PRIMARY KEY (cust_id)
+) ENGINE=InnoDB;
+
+-- 创建新表时，指定的表名必须不存在，否则将出错
+-- 如果要在一个表不存在时创建它，应该在表名后给出IF NOT EXISTS
+
+-- NULL为默认设置，如果不指定NOT NULL，则认为指定的是NULL
+-- NULL表示的是没有值，不等同于空串（''是一个有效值）
+
+-----------------------------------------------------------------------------------------
+
+-- 主键
+
+CREATE TABLE orderitems
+(
+  order_num  int          NOT NULL ,
+  order_item int          NOT NULL ,
+  prod_id    char(10)     NOT NULL ,
+  quantity   int          NOT NULL ,
+  item_price decimal(8,2) NOT NULL ,
+  PRIMARY KEY (order_num, order_item)
+) ENGINE=InnoDB;
+
+-- 为创建由多个列组成的主键，应该以逗号分隔的列表给出各列名
+
+-----------------------------------------------------------------------------------------
+
+-- 使用AUTO_INCREMENT
+
+cust_id      int       NOT NULL AUTO_INCREMENT,
+
+-- AUTO_INCREMENT告诉MySQL，本列每当增加一行时自动增量。每次执行一个INSERT操作时，MySQL自动对该列增量（从而才有这个关键字AUTO_INCREMENT），给该列赋予下一个可用的值
+-- 每个表只允许一个AUTO_INCREMENT列，而且它必须被索引（如，通过使它成为主键）
+
+-- 覆盖AUTO_INCREMENT ： 可以在INSERT语句中指定一个值，只要它是唯一的（至今尚未使用过）即可，该值将被用来替代自动生成的值。后续的增量将开始使用该手工插入的值
+-- 确定AUTO_INCREMENT ： 在使用AUTO_INCREMENT列时，可使用last_insert_id函数来获得这个值。如：SELECT last_insert_id()，此语句返回最后一个AUTO_INCREMENT值，然后可以将它用于后续的MySQL语句
+
+-----------------------------------------------------------------------------------------
+
+-- 指定默认值
+
+CREATE TABLE orderitems
+(
+  order_num  int          NOT NULL ,
+  order_item int          NOT NULL ,
+  prod_id    char(10)     NOT NULL ,
+  quantity   int          NOT NULL DEFAULT 1,       -- 在未给出数量的情况下使用数量1
+  item_price decimal(8,2) NOT NULL ,
+  PRIMARY KEY (order_num, order_item)
+) ENGINE=InnoDB;
+
+-- 不允许使用函数作为默认值，只支持常量
+
+-----------------------------------------------------------------------------------------
+
+-- 引擎类型
+
+-- InnoDB：是一个可靠的事务处理引擎，不支持全文本搜索
+-- MEMORY：在功能上等同于MyISAM，但由于数据存储在内存中，速度很快（特别适合临时表）
+-- MyISAM：是一个性能极高的引擎，支持全文本搜索，但不支持事务处理
+
+-- 混用引擎类型有一个大缺陷。外键不能跨引擎，即使用一个引擎的表不能引用具有使用不用引擎的表的外键
+
+-----------------------------------------------------------------------------------------
+
+-- 更新表
+
+-- 增加一个名为vend_phone的列
+ALTER TABLE vendors ADD vend_phone CHAR(20);    
+
+-- 删除指定列
+ALTER TABLE vendors DROP COLUMN vend_phone;     
+
+-- 定义外键
+ALTER TABLE orderitems ADD CONSTRAINT fk_orderitems_orders FOREIGN KEY (order_num) REFERENCES orders (order_num);
+ALTER TABLE orderitems ADD CONSTRAINT fk_orderitems_products FOREIGN KEY (prod_id) REFERENCES products (prod_id);
+ALTER TABLE orders ADD CONSTRAINT fk_orders_customers FOREIGN KEY (cust_id) REFERENCES customers (cust_id);
+ALTER TABLE products ADD CONSTRAINT fk_products_vendors FOREIGN KEY (vend_id) REFERENCES vendors (vend_id);
+
+-----------------------------------------------------------------------------------------
+
+-- 删除表
+
+DROP TABLE customers2;
+
+-----------------------------------------------------------------------------------------
+
+-- 重命名表
+
+-- 重命名一个表
+RENAME TABLE customers2 TO customers;
+
+-- 重命名多个表
+RENAME TABLE backup_customers TO customers,
+            backup_vendors TO vendors,
+            backup_products TO products;
