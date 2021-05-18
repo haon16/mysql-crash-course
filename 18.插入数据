@@ -43,7 +43,7 @@ mysql> INSERT INTO customers(cust_address,
             NULL, 
             NULL);
 
--- 在表明后的括号里明确地给出了列名，VALUES必须以其指定的次序匹配指定的列名，不一定按各个列出现在实际表中的次序。优点时即使表的结构哦改变，此INSERT语句仍然能正确工作。
+-- 在表名后的括号里明确地给出了列名，VALUES必须以其指定的次序匹配指定的列名，不一定按各个列出现在实际表中的次序。优点是即使表的结构改变，此INSERT语句仍然能正确工作。
 -- 省略列的条件：允许为NULL值或者表定义给出了默认值
 
 -----------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ mysql> INSERT INTO customers(cust_name,         -- 多条INSERT语句
             'CA', 
             '90046', 
             'USA');
-      INSERT INTO customers(cust_name,
+       INSERT INTO customers(cust_name,
             cust_address,
             cust_city,
             cust_state,
